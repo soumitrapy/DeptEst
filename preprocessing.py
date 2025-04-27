@@ -44,7 +44,7 @@ class CustomDataset(Dataset):
 def get_datasets_and_dataloaders(config):
     cfg = config['dataset']
     ds = {'train': CustomDataset(img_dir=cfg['training-images'], depth_dir=cfg['training-depths'], root=cfg['root'], transform=transforms.ToTensor(), target_transform=transforms.ToTensor()),
-          'valid': CustomDataset(img_dir=cfg['validation-images'], depth_dir=cfg['validation-depths'], root=cfg['root'], transform=transforms.ToTensor(), target_transform=transforms.ToTensor()),
+          'val': CustomDataset(img_dir=cfg['validation-images'], depth_dir=cfg['validation-depths'], root=cfg['root'], transform=transforms.ToTensor(), target_transform=transforms.ToTensor()),
           'test': CustomDataset(img_dir=cfg['testing-images'], root=cfg['root'], transform=transforms.ToTensor())
           }
     dl = {key: DataLoader(data, batch_size=cfg['batch_size'], shuffle=True) for key, data in ds.items()}
