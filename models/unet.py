@@ -66,7 +66,7 @@ class UNet(nn.Module):
         return x
 
 if __name__=="__main__":
-    # m = UNet()
+    m = UNet()
     # x = torch.randn(10,1, 256, 256)
     # xx = torch.randn(10, 4, 342, 268)
     # print(m(x).shape)
