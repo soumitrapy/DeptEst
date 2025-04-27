@@ -48,7 +48,7 @@ class UNet(nn.Module):
         for i in range(len(self.filters)-1, 1, -1):
             self.ups.append(nn.ConvTranspose2d(self.filters[i], self.filters[i-1], kernel_size = 2, stride=2))
             self.crcs.append(CropandConcat())
-            self.dconvs2.append(DoubleConvolution(self.filters[i], self.filters[i-1]))
+            self.dconvs2.append(DoubleConvolution(self.filters[i-1]*2, self.filters[i-1]))
         self.last_conv = nn.Conv2d(in_channels=self.filters[1], out_channels=self.filters[0], kernel_size=1)
 
         
@@ -60,6 +60,7 @@ class UNet(nn.Module):
             if down is not None:
                 outs.append(x)
                 x = down(x)
+
         for i, (up, crc, dconv) in enumerate(zip(self.ups, self.crcs, self.dconvs2)):
             x = up(x)
             x = crc(x, outs[-i-1])
@@ -69,7 +70,8 @@ class UNet(nn.Module):
         return x
 
 if __name__=="__main__":
-    m = UNet()
-    # x = torch.randn(10,1, 256, 256)
-    # xx = torch.randn(10, 4, 342, 268)
-    # print(m(x).shape)
+    config = {'model':{'filters':[1, 32, 32, 64, 64, 128]}}
+    m = UNet(config)
+    x = torch.randn(10,1, 256, 256)
+    xx = torch.randn(10, 4, 342, 268)
+    print(m(x).shape)
