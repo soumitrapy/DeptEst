@@ -1,5 +1,10 @@
 *.zip
 competition-data
+models/smallcnn.py
+models/pretrained.py
+notebook1.ipynb
+predictions
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
