@@ -103,4 +103,10 @@ def predict(model, dl, model_name = None, device='cpu', dest = 'predictions', us
                 img = to_pil_image(x)
                 img.save(os.path.join(save_dir, name))
 
-    images_to_csv_with_metadata(save_dir, 'predictions/pred_'+model_name+'.csv')
+    predictions_csv = 'predictions/pred_'+model_name+'.csv'
+    images_to_csv_with_metadata(save_dir, predictions_csv)
+    if use_wandb:
+        artifact = wandb.Artifact("csv_files")
+        artifact.add_file(predictions_csv)
+        artifact.save()
+        wandb.log_artifact(artifact)
