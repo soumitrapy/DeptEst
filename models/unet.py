@@ -27,9 +27,12 @@ class CropandConcat(nn.Module):
         return x
 
 class UNet(nn.Module):
-    def __init__(self,):
+    def __init__(self,config):
         super().__init__()
+        cfg = config['model']
         self.filters = [1, 64, 128, 256, 512, 1024]
+        if cfg.get('filters', False):
+            self.filters = cfg['filters']
         self.dconvs = nn.ModuleList()
         self.downs = nn.ModuleList()
         for i in range(len(self.filters)-1):
