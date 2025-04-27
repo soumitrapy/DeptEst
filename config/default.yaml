@@ -11,11 +11,11 @@ dataset:
   validation-depths: validation-depths
   testing-images: testing-images
   img_size: 256
-  batch_size: 10
+  batch_size: 50
 
 model:
   name: defaultmodel
 
 train:
-  epochs: 1
+  epochs: 10
   val_interval: 1
