@@ -11,7 +11,7 @@ dataset:
   validation-depths: validation-depths
   testing-images: testing-images
   img_size: 256
-  batch_size: 50
+  batch_size: 10
 
 model:
   name: defaultmodel
