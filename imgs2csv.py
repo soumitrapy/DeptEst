@@ -31,11 +31,11 @@ def images_to_csv_with_metadata(image_folder, output_csv):
     # Save to CSV
     df.to_csv(output_csv, index=False)
 
-# Paths for prediction and ground truth images
-predictions_folder = "data/sample_solution"
+# # Paths for prediction and ground truth images
+# predictions_folder = "data/sample_solution"
 
-# Output CSV paths
-predictions_csv = "predictions.csv"
+# # Output CSV paths
+# predictions_csv = "predictions.csv"
 
-# Convert prediction images to CSV
-images_to_csv_with_metadata(predictions_folder, predictions_csv)
+# # Convert prediction images to CSV
+# images_to_csv_with_metadata(predictions_folder, predictions_csv)

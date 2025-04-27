@@ -64,7 +64,7 @@ def train(model, optimizer, loss_fn, dataloaders, config, scheduler = None, devi
     for epoch in range(cfg['epochs']):
         model.train()
         train_loss = train_one_epoch(model, dataloaders['train'], optimizer, loss_fn, epoch=epoch, device=device, use_wandb=use_wandb)
-        if (epoch+1)%config['val_interval']==0:
+        if (epoch+1)%cfg['val_interval']==0:
             val_loss = val_one_epoch(model, dataloaders['val'], loss_fn, device=device)
             if use_wandb:
                 val_metrics = {"val/val_loss": val_loss}
@@ -84,11 +84,12 @@ def train(model, optimizer, loss_fn, dataloaders, config, scheduler = None, devi
             scheduler.step()
     return model
 
-def predict(model, dl, device='cpu', dest = 'predictions'):
+def predict(model, dl, device='cpu', dest = 'predictions', use_wandb=False):
     model.to(device)
     model.eval()
     os.makedirs('predictions', exist_ok=True)
-    save_dir = os.path.join('predictions',type(model).__name__+'_'+str(datetime.now())[8:16])
+    model_name = type(model).__name__+'_'+str(datetime.now())[8:16]
+    save_dir = os.path.join('predictions',model_name)
     print(save_dir)
     os.makedirs(save_dir)
     pbar = tqdm(dl,desc=f"Predicting.... ")
@@ -100,8 +101,10 @@ def predict(model, dl, device='cpu', dest = 'predictions'):
             for x,name in zip(outputs, im_names):
                 img = to_pil_image(x)
                 img.save(os.path.join(save_dir, name))
+            
+    
 
-    images_to_csv_with_metadata(save_dir, 'predictions/predictions.csv')
+    images_to_csv_with_metadata(save_dir, 'predictions/pred_'+model_name+'.csv')
     
     
 
