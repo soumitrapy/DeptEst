@@ -76,9 +76,9 @@ def train(model, optimizer, loss_fn, dataloaders, config, indices = [1,2,5,6,9],
 
     for epoch in range(cfg['epochs']):
         model.train()
-        train_loss = train_one_epoch(model, dataloaders['train'], optimizer, loss_fn, epoch=epoch, device=device, use_wandb=use_wandb)
+        train_loss = train_one_epoch(model, dataloaders['train'], optimizer, loss_fn, indices = indices, epoch=epoch, device=device, use_wandb=use_wandb)
         if (epoch+1)%cfg['val_interval']==0:
-            val_loss = val_one_epoch(model, dataloaders['val'], loss_fn, device=device)
+            val_loss = val_one_epoch(model, dataloaders['val'], loss_fn, indices = indices, device=device)
             if use_wandb:
                 val_metrics = {"val/val_loss": val_loss}
                 wandb.log(val_metrics,step=wandb.run.step)
