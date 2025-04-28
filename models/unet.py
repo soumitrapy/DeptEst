@@ -42,6 +42,10 @@ class UNet(nn.Module):
             else:
                 self.downs.append(nn.MaxPool2d(kernel_size=2))
         
+        self.pups = nn.ModuleList()
+        for i in range(1, len(self.filters)):
+            self.pups.append(nn.ConvTranspose2d(self.filters[i], self.filters[0], kernel_size=2**(i-1), stride=2**(i-1)))
+        
         self.ups = nn.ModuleList()
         self.crcs = nn.ModuleList()
         self.dconvs2 = nn.ModuleList()
@@ -55,23 +59,34 @@ class UNet(nn.Module):
 
     def forward(self, x):
         outs = []
+        partials = []
         for dconv, down in zip(self.dconvs, self.downs):
             x = dconv(x)
             if down is not None:
                 outs.append(x)
+                partials.append(x)
                 x = down(x)
 
+        partials.append(x)
         for i, (up, crc, dconv) in enumerate(zip(self.ups, self.crcs, self.dconvs2)):
             x = up(x)
             x = crc(x, outs[-i-1])
             x = dconv(x)
+            partials.append(x)
         x = self.last_conv(x)
         x = torch.sigmoid(x)
-        return x
+
+        pouts = []
+        for i in range(1,len(self.filters)):
+            o1, o2 = self.pups[i-1](partials[i-1]), self.pups[i-1](partials[-i])
+            pouts.extend([o1,o2])
+  
+        return pouts
 
 if __name__=="__main__":
-    config = {'model':{'filters':[1, 32, 32, 64, 64, 128]}}
+    config = {'model':{'filters':[1, 4, 8, 16, 32, 64]}}
     m = UNet(config)
-    x = torch.randn(10,1, 256, 256)
-    xx = torch.randn(10, 4, 342, 268)
-    print(m(x).shape)
+    x = torch.randn(5,1, 256, 256)
+    #xx = torch.randn(10, 4, 342, 268)
+    for t in m(x):
+        print(t.shape)
