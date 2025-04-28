@@ -40,6 +40,7 @@ def val_one_epoch(model, dl, loss_fn, indices = [1,2,5,6,9], device='cpu'):
     model.to(device)
     model.eval()
     running_loss = 0.0
+    running_loss1 = 0.0
 
     pbar = tqdm(dl,desc=f"Validation: ")
     with torch.no_grad():
