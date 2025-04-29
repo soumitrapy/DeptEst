@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms.functional import to_pil_image
 from imgs2csv import images_to_csv_with_metadata
 
-def train_one_epoch(model, dl, optimizer, loss_fn, epoch=1, device='cpu', use_wandb=False):
+def train_one_epoch(model, dl, optimizer, loss_fn, epoch=1, device='cpu', use_wandb=False, pretrain=False):
     model.to(device)
     model.train()
     running_loss = 0.0
@@ -18,6 +18,9 @@ def train_one_epoch(model, dl, optimizer, loss_fn, epoch=1, device='cpu', use_wa
     n_steps_per_epoch = math.ceil(len(dl.dataset) / dl.batch_size)
     for step, (inputs, labels) in enumerate(pbar):
         inputs, labels = inputs.to(device), labels.to(device)
+        if pretrain:
+            labels = inputs
+
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = loss_fn(outputs, labels)
@@ -55,7 +58,7 @@ def val_one_epoch(model, dl, loss_fn, device='cpu'):
 
 
 
-def train(model, optimizer, loss_fn, dataloaders, config, scheduler = None, device = 'cpu', use_wandb=False):
+def train(model, optimizer, loss_fn, dataloaders, config, scheduler = None, device = 'cpu', use_wandb=False, pretrain=False):
     model.to(device)
     best_loss = float('inf')
     os.makedirs('ckpts', exist_ok=True)
@@ -63,7 +66,7 @@ def train(model, optimizer, loss_fn, dataloaders, config, scheduler = None, devi
 
     for epoch in range(cfg['epochs']):
         model.train()
-        train_loss = train_one_epoch(model, dataloaders['train'], optimizer, loss_fn, epoch=epoch, device=device, use_wandb=use_wandb)
+        train_loss = train_one_epoch(model, dataloaders['train'], optimizer, loss_fn, epoch=epoch, device=device, use_wandb=use_wandb, pretrain=pretrain)
         if (epoch+1)%cfg['val_interval']==0:
             val_loss = val_one_epoch(model, dataloaders['val'], loss_fn, device=device)
             if use_wandb:
@@ -82,6 +85,9 @@ def train(model, optimizer, loss_fn, dataloaders, config, scheduler = None, devi
 
         if scheduler:
             scheduler.step()
+        if (epoch+1)%3==0:
+            predict(model, dataloaders['test'], model_name = model_name, device=device, dest = 'predictions', use_wandb=config['use_wandb'])
+
     return model
 
 def predict(model, dl, model_name = None, device='cpu', dest = 'predictions', use_wandb=False):
